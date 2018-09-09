@@ -4,6 +4,11 @@ public class OrderStatus {
     private Long id;
     private String status;
 
+    public OrderStatus(Long id, String status) {
+        this.id = id;
+        this.status = status;
+    }
+
     public Long getId() {
         return id;
     }

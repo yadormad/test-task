@@ -1,17 +1,21 @@
 package com.haulmont.testtask.dao.impl.hibernate.entity;
 
+import com.haulmont.testtask.model.Client;
+import com.haulmont.testtask.model.Order;
+
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "CLIENT_TABLE", schema = "PUBLIC", catalog = "PUBLIC")
-public class ClientTableEntity {
+public class ClientTableEntity implements HibernateEntity<Client> {
     private long id;
     private String firstname;
     private String lastname;
     private String fathername;
-    private Integer phone;
+    private String phone;
     private Set<OrderTableEntity> orderEntitySet;
 
     @OneToMany(mappedBy = "orderStatusEntity")
@@ -66,11 +70,11 @@ public class ClientTableEntity {
 
     @Basic
     @Column(name = "PHONE")
-    public Integer getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(Integer phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
@@ -88,7 +92,40 @@ public class ClientTableEntity {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(id, firstname, lastname, fathername, phone);
+    }
+
+
+    @Override
+    public Client toModel() {
+        Client clientModel = new Client(id, firstname, lastname, fathername, phone);
+        this.exportOrders(clientModel);
+        return clientModel;
+    }
+
+    @Override
+    public ClientTableEntity toEntity(Client model) {
+        this.id = model.getId();
+        this.firstname = model.getFirstName();
+        this.lastname = model.getLastName();
+        this.fathername = model.getFatherName();
+        this.phone = model.getPhoneNumber();
+        this.importOrders(model);
+        return this;
+    }
+
+    private void exportOrders(Client model) {
+        Set<Order> clientOrders = new HashSet<>();
+        for(OrderTableEntity clientOrderEntity: orderEntitySet) {
+            clientOrders.add(clientOrderEntity.toModel());
+        }
+        model.setClientOrders(clientOrders);
+    }
+
+    private void importOrders(Client model) {
+        orderEntitySet = new HashSet<>();
+        for(Order clientOrderModel: model.getClientOrders()) {
+            orderEntitySet.add(new OrderTableEntity().toEntity(clientOrderModel));
+        }
     }
 }

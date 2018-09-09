@@ -8,5 +8,5 @@ public interface DaoFactory {
     GenericDao<Long, Client> getClientDao();
     GenericDao<Long, Machinist> getMachinistDao();
     GenericDao<Long, Order> getOrderDao();
-    //GenericDao<Long, Client> getClientDao();
+    OrderStatusDao getOrderStatusDao();
 }

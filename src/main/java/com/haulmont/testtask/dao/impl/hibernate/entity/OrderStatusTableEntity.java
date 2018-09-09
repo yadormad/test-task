@@ -1,12 +1,14 @@
 package com.haulmont.testtask.dao.impl.hibernate.entity;
 
+import com.haulmont.testtask.model.OrderStatus;
+
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "ORDER_STATUS_TABLE", schema = "PUBLIC", catalog = "PUBLIC")
-public class OrderStatusTableEntity {
+public class OrderStatusTableEntity implements HibernateEntity<OrderStatus> {
     private long id;
     private String status;
     private Set<OrderTableEntity> orderEntitySet;
@@ -54,5 +56,16 @@ public class OrderStatusTableEntity {
     public int hashCode() {
 
         return Objects.hash(id, status);
+    }
+
+    @Override
+    public OrderStatus toModel() {
+        return new OrderStatus(id, status);
+    }
+
+    @Override
+    public OrderStatusTableEntity toEntity(OrderStatus model) {
+        //immutable
+        return this;
     }
 }

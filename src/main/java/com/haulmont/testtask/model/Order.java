@@ -9,8 +9,23 @@ public class Order {
     private Machinist machinist;
     private Date startDate;
     private Date endDate;
-    private Integer cost;
+    private Double cost;
     private OrderStatus status;
+
+    public Order(Long id, String description, Date startDate, Date endDate, Double cost) {
+        this.id = id;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.cost = cost;
+    }
+
+    public Order(String description, Date startDate, Date endDate, Double cost) {
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.cost = cost;
+    }
 
     public Long getId() {
         return id;
@@ -60,11 +75,11 @@ public class Order {
         this.endDate = endDate;
     }
 
-    public Integer getCost() {
+    public Double getCost() {
         return cost;
     }
 
-    public void setCost(Integer cost) {
+    public void setCost(Double cost) {
         this.cost = cost;
     }
 

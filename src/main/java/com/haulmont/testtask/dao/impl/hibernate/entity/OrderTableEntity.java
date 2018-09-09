@@ -1,12 +1,14 @@
 package com.haulmont.testtask.dao.impl.hibernate.entity;
 
+import com.haulmont.testtask.model.Order;
+
 import javax.persistence.*;
 import java.sql.Date;
 import java.util.Objects;
 
 @Entity
 @Table(name = "ORDER_TABLE", schema = "PUBLIC", catalog = "PUBLIC")
-public class OrderTableEntity {
+public class OrderTableEntity implements HibernateEntity<Order> {
     private long id;
     private String description;
     private ClientTableEntity clientEntity;
@@ -116,5 +118,35 @@ public class OrderTableEntity {
     public int hashCode() {
 
         return Objects.hash(id, description, startDate, endDate, fullCost);
+    }
+
+    @Override
+    public Order toModel() {
+        Order orderModel = new Order(id, description, startDate, endDate, fullCost);
+        this.exportRelations(orderModel);
+        return orderModel;
+    }
+
+    @Override
+    public OrderTableEntity toEntity(Order model) {
+        this.id = model.getId();
+        this.description = model.getDescription();
+        this.startDate = new java.sql.Date(model.getStartDate().getTime());
+        this.endDate = new java.sql.Date(model.getEndDate().getTime());
+        this.fullCost = model.getCost();
+        this.importRelations(model);
+        return this;
+    }
+
+    private void exportRelations(Order model) {
+        model.setClient(this.clientEntity.toModel());
+        model.setMachinist(this.machinistEntity.toModel());
+        model.setStatus(this.orderStatusEntity.toModel());
+    }
+
+    private void importRelations(Order model) {
+        this.clientEntity.toEntity(model.getClient());
+        this.machinistEntity.toEntity(model.getMachinist());
+        this.orderStatusEntity.toEntity(model.getStatus());
     }
 }

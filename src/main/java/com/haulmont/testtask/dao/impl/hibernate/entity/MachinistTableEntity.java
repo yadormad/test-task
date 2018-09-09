@@ -1,12 +1,16 @@
 package com.haulmont.testtask.dao.impl.hibernate.entity;
 
+import com.haulmont.testtask.model.Machinist;
+import com.haulmont.testtask.model.Order;
+
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "MACHINIST_TABLE", schema = "PUBLIC", catalog = "PUBLIC")
-public class MachinistTableEntity {
+public class MachinistTableEntity implements HibernateEntity<Machinist> {
     private long id;
     private String firstname;
     private String lastname;
@@ -90,5 +94,38 @@ public class MachinistTableEntity {
     public int hashCode() {
 
         return Objects.hash(id, firstname, lastname, fathername, hourCost);
+    }
+
+    @Override
+    public Machinist toModel() {
+         Machinist machinistModel = new Machinist(id, firstname, lastname, fathername, hourCost);
+         this.exportOrders(machinistModel);
+        return machinistModel;
+    }
+
+    @Override
+    public MachinistTableEntity toEntity(Machinist model) {
+        this.id = model.getId();
+        this.firstname = model.getFirstName();
+        this.lastname = model.getLastName();
+        this.fathername = model.getFatherName();
+        this.hourCost = model.getValueCost();
+        this.importOrders(model);
+        return this;
+    }
+
+    private void exportOrders(Machinist model) {
+        Set<Order> machinistOrders = new HashSet<>();
+        for(OrderTableEntity macinistOrderEntity: orderEntitySet) {
+            machinistOrders.add(macinistOrderEntity.toModel());
+        }
+        model.setMachinistOrders(machinistOrders);
+    }
+
+    private void importOrders(Machinist model) {
+        orderEntitySet = new HashSet<>();
+        for(Order machinistOrderModel: model.getMachinistOrders()) {
+            orderEntitySet.add(new OrderTableEntity().toEntity(machinistOrderModel));
+        }
     }
 }
