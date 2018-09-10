@@ -23,9 +23,11 @@ public class ClientHibernateDao implements GenericDao<Long, Client> {
         manager.getTransaction().begin();
         ClientTableEntity clientEntity = new ClientTableEntity();
         clientEntity.toEntity(clientModel);
+        clientEntity.importOrders(clientModel);
         manager.merge(clientEntity);
         manager.getTransaction().commit();
-        return clientEntity.toModel();
+        clientModel.setId(clientEntity.getId());
+        return clientModel;
     }
 
     @Override
@@ -43,14 +45,15 @@ public class ClientHibernateDao implements GenericDao<Long, Client> {
 
     @Override
     public Client get(Long id) {
-        return manager.find(ClientTableEntity.class, id).toModel();
+        ClientTableEntity clientEntity = manager.find(ClientTableEntity.class, id);
+        return clientEntity.exportOrders(clientEntity.toModel());
     }
 
     @Override
     public List<Client> getAll() {
         List<Client> allClients = new ArrayList<>();
         for(ClientTableEntity clientEntity: manager.createQuery("SELECT c FROM ClientTableEntity c", ClientTableEntity.class).getResultList()) {
-            allClients.add(clientEntity.toModel());
+            allClients.add(clientEntity.exportOrders(clientEntity.toModel()));
         }
         return allClients;
     }

@@ -23,9 +23,11 @@ public class MachinistHibernateDao implements GenericDao<Long, Machinist> {
         manager.getTransaction().begin();
         MachinistTableEntity machinistEntity = new MachinistTableEntity();
         machinistEntity.toEntity(machinistModel);
+        machinistEntity.importOrders(machinistModel);
         manager.merge(machinistEntity);
         manager.getTransaction().commit();
-        return machinistEntity.toModel();
+        machinistModel.setId(machinistEntity.getId());
+        return machinistModel;
     }
 
     @Override
@@ -43,14 +45,15 @@ public class MachinistHibernateDao implements GenericDao<Long, Machinist> {
 
     @Override
     public Machinist get(Long id) {
-        return manager.find(MachinistTableEntity.class, id).toModel();
+        MachinistTableEntity machinistEntity = manager.find(MachinistTableEntity.class, id);
+        return machinistEntity.exportOrders(machinistEntity.toModel());
     }
 
     @Override
     public List<Machinist> getAll() {
         List<Machinist> allMachinists = new ArrayList<>();
         for(MachinistTableEntity machinistEntity: manager.createQuery("SELECT c FROM MachinistTableEntity c", MachinistTableEntity.class).getResultList()) {
-            allMachinists.add(machinistEntity.toModel());
+            allMachinists.add(machinistEntity.exportOrders(machinistEntity.toModel()));
         }
         return allMachinists;
     }

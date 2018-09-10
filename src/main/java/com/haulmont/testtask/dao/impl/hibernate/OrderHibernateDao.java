@@ -20,9 +20,11 @@ public class OrderHibernateDao implements GenericDao<Long, Order> {
         manager.getTransaction().begin();
         OrderTableEntity orderEntity = new OrderTableEntity();
         orderEntity.toEntity(orderModel);
+        orderEntity.importRelations(orderModel);
         manager.merge(orderEntity);
         manager.getTransaction().commit();
-        return orderEntity.toModel();
+        orderModel.setId(orderEntity.getId());
+        return orderModel;
     }
 
     @Override
@@ -34,14 +36,15 @@ public class OrderHibernateDao implements GenericDao<Long, Order> {
 
     @Override
     public Order get(Long id) {
-        return manager.find(OrderTableEntity.class, id).toModel();
+        OrderTableEntity orderEntity = manager.find(OrderTableEntity.class, id);
+        return orderEntity.exportRelations(orderEntity.toModel());
     }
 
     @Override
     public List<Order> getAll() {
         List<Order> allOrders = new ArrayList<>();
         for(OrderTableEntity orderEntity: manager.createQuery("SELECT c FROM OrderTableEntity c", OrderTableEntity.class).getResultList()) {
-            allOrders.add(orderEntity.toModel());
+            allOrders.add(orderEntity.exportRelations(orderEntity.toModel()));
         }
         return allOrders;
     }

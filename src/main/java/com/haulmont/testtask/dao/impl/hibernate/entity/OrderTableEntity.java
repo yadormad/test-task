@@ -122,9 +122,7 @@ public class OrderTableEntity implements HibernateEntity<Order> {
 
     @Override
     public Order toModel() {
-        Order orderModel = new Order(id, description, startDate, endDate, fullCost);
-        this.exportRelations(orderModel);
-        return orderModel;
+        return new Order(id, description, startDate, endDate, fullCost);
     }
 
     @Override
@@ -134,17 +132,17 @@ public class OrderTableEntity implements HibernateEntity<Order> {
         this.startDate = new java.sql.Date(model.getStartDate().getTime());
         this.endDate = new java.sql.Date(model.getEndDate().getTime());
         this.fullCost = model.getCost();
-        this.importRelations(model);
         return this;
     }
 
-    private void exportRelations(Order model) {
+    public Order exportRelations(Order model) {
         model.setClient(this.clientEntity.toModel());
         model.setMachinist(this.machinistEntity.toModel());
         model.setStatus(this.orderStatusEntity.toModel());
+        return model;
     }
 
-    private void importRelations(Order model) {
+    public void importRelations(Order model) {
         this.clientEntity.toEntity(model.getClient());
         this.machinistEntity.toEntity(model.getMachinist());
         this.orderStatusEntity.toEntity(model.getStatus());

@@ -98,9 +98,7 @@ public class ClientTableEntity implements HibernateEntity<Client> {
 
     @Override
     public Client toModel() {
-        Client clientModel = new Client(id, firstname, lastname, fathername, phone);
-        this.exportOrders(clientModel);
-        return clientModel;
+        return new Client(id, firstname, lastname, fathername, phone);
     }
 
     @Override
@@ -110,19 +108,19 @@ public class ClientTableEntity implements HibernateEntity<Client> {
         this.lastname = model.getLastName();
         this.fathername = model.getFatherName();
         this.phone = model.getPhoneNumber();
-        this.importOrders(model);
         return this;
     }
 
-    private void exportOrders(Client model) {
+    public Client exportOrders(Client model) {
         Set<Order> clientOrders = new HashSet<>();
         for(OrderTableEntity clientOrderEntity: orderEntitySet) {
             clientOrders.add(clientOrderEntity.toModel());
         }
         model.setClientOrders(clientOrders);
+        return model;
     }
 
-    private void importOrders(Client model) {
+    public void importOrders(Client model) {
         orderEntitySet = new HashSet<>();
         for(Order clientOrderModel: model.getClientOrders()) {
             orderEntitySet.add(new OrderTableEntity().toEntity(clientOrderModel));

@@ -98,9 +98,7 @@ public class MachinistTableEntity implements HibernateEntity<Machinist> {
 
     @Override
     public Machinist toModel() {
-         Machinist machinistModel = new Machinist(id, firstname, lastname, fathername, hourCost);
-         this.exportOrders(machinistModel);
-        return machinistModel;
+        return new Machinist(id, firstname, lastname, fathername, hourCost);
     }
 
     @Override
@@ -110,19 +108,19 @@ public class MachinistTableEntity implements HibernateEntity<Machinist> {
         this.lastname = model.getLastName();
         this.fathername = model.getFatherName();
         this.hourCost = model.getValueCost();
-        this.importOrders(model);
         return this;
     }
 
-    private void exportOrders(Machinist model) {
+    public Machinist exportOrders(Machinist model) {
         Set<Order> machinistOrders = new HashSet<>();
-        for(OrderTableEntity macinistOrderEntity: orderEntitySet) {
-            machinistOrders.add(macinistOrderEntity.toModel());
+        for(OrderTableEntity machinistOrderEntity: orderEntitySet) {
+            machinistOrders.add(machinistOrderEntity.toModel());
         }
         model.setMachinistOrders(machinistOrders);
+        return model;
     }
 
-    private void importOrders(Machinist model) {
+    public void importOrders(Machinist model) {
         orderEntitySet = new HashSet<>();
         for(Order machinistOrderModel: model.getMachinistOrders()) {
             orderEntitySet.add(new OrderTableEntity().toEntity(machinistOrderModel));

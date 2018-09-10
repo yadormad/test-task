@@ -6,6 +6,11 @@
              version="1.0">
 
     <persistence-unit name="workshopPersistenceUnit" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>com.haulmont.testtask.dao.impl.hibernate.entity.ClientTableEntity</class>
+        <class>com.haulmont.testtask.dao.impl.hibernate.entity.MachinistTableEntity</class>
+        <class>com.haulmont.testtask.dao.impl.hibernate.entity.OrderStatusTableEntity</class>
+        <class>com.haulmont.testtask.dao.impl.hibernate.entity.OrderTableEntity</class>
         <properties>
             <property name="hibernate.connection.url" value="jdbc:hsqldb:file:database/workshop"/>
             <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbc.JDBCDriver"/>
