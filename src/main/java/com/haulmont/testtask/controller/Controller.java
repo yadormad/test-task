@@ -24,4 +24,10 @@ public class Controller {
     public List<Order> getAllOrders() {
         return daoFactory.getOrderDao().getAll();
     }
+    public Client addClient(Client client) {
+        return daoFactory.getClientDao().add(client);
+    }
+    public Client updateClient(Client client) {
+        return daoFactory.getClientDao().update(client);
+    }
 }

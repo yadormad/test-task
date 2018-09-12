@@ -6,5 +6,6 @@ public interface GenericDao<K, O> {
     O add(O entity);
     void delete(K id) throws DeleteException;
     O get(K id);
+    O update(O entity);
     List<O> getAll();
 }

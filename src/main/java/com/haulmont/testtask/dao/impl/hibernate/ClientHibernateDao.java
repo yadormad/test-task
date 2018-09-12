@@ -23,10 +23,20 @@ public class ClientHibernateDao implements GenericDao<Long, Client> {
         manager.getTransaction().begin();
         ClientTableEntity clientEntity = new ClientTableEntity();
         clientEntity.toEntity(clientModel);
+        manager.persist(clientEntity);
+        manager.getTransaction().commit();
+        clientModel.setId(clientEntity.getId());
+        return clientModel;
+    }
+
+    @Override
+    public Client update(Client clientModel) {
+        manager.getTransaction().begin();
+        ClientTableEntity clientEntity = new ClientTableEntity();
+        clientEntity.toEntity(clientModel);
         clientEntity.importOrders(clientModel);
         manager.merge(clientEntity);
         manager.getTransaction().commit();
-        clientModel.setId(clientEntity.getId());
         return clientModel;
     }
 

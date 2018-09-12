@@ -2,8 +2,6 @@ package com.haulmont.testtask.dao.impl.hibernate;
 
 import com.haulmont.testtask.dao.OrderStatusDao;
 import com.haulmont.testtask.dao.impl.hibernate.entity.OrderStatusTableEntity;
-import com.haulmont.testtask.dao.impl.hibernate.entity.OrderTableEntity;
-import com.haulmont.testtask.model.Order;
 import com.haulmont.testtask.model.OrderStatus;
 
 import javax.persistence.EntityManager;
@@ -16,7 +14,6 @@ public class OrderStatusHibernateDao implements OrderStatusDao {
     OrderStatusHibernateDao(EntityManager manager) {
         this.manager = manager;
     }
-
 
     @Override
     public List<OrderStatus> getAll() {

@@ -21,9 +21,20 @@ public class OrderHibernateDao implements GenericDao<Long, Order> {
         OrderTableEntity orderEntity = new OrderTableEntity();
         orderEntity.toEntity(orderModel);
         orderEntity.importRelations(orderModel);
-        manager.merge(orderEntity);
+        manager.persist(orderEntity);
         manager.getTransaction().commit();
         orderModel.setId(orderEntity.getId());
+        return orderModel;
+    }
+
+    @Override
+    public Order update(Order orderModel) {
+        manager.getTransaction().begin();
+        OrderTableEntity orderEntity = new OrderTableEntity();
+        orderEntity.toEntity(orderModel);
+        orderEntity.importRelations(orderModel);
+        manager.merge(orderEntity);
+        manager.getTransaction().commit();
         return orderModel;
     }
 
