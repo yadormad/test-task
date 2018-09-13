@@ -1,6 +1,9 @@
 package com.haulmont.testtask.dao.impl.hibernate;
 
 import com.haulmont.testtask.dao.GenericDao;
+import com.haulmont.testtask.dao.impl.hibernate.entity.ClientTableEntity;
+import com.haulmont.testtask.dao.impl.hibernate.entity.MachinistTableEntity;
+import com.haulmont.testtask.dao.impl.hibernate.entity.OrderStatusTableEntity;
 import com.haulmont.testtask.dao.impl.hibernate.entity.OrderTableEntity;
 import com.haulmont.testtask.model.Order;
 
@@ -20,7 +23,7 @@ public class OrderHibernateDao implements GenericDao<Long, Order> {
         manager.getTransaction().begin();
         OrderTableEntity orderEntity = new OrderTableEntity();
         orderEntity.toEntity(orderModel);
-        orderEntity.importRelations(orderModel);
+        importRelations(orderEntity, orderModel);
         manager.persist(orderEntity);
         manager.getTransaction().commit();
         orderModel.setId(orderEntity.getId());
@@ -28,14 +31,13 @@ public class OrderHibernateDao implements GenericDao<Long, Order> {
     }
 
     @Override
-    public Order update(Order orderModel) {
+    public void update(Order orderModel) {
         manager.getTransaction().begin();
         OrderTableEntity orderEntity = new OrderTableEntity();
         orderEntity.toEntity(orderModel);
-        orderEntity.importRelations(orderModel);
+        importRelations(orderEntity, orderModel);
         manager.merge(orderEntity);
         manager.getTransaction().commit();
-        return orderModel;
     }
 
     @Override
@@ -58,5 +60,11 @@ public class OrderHibernateDao implements GenericDao<Long, Order> {
             allOrders.add(orderEntity.exportRelations(orderEntity.toModel()));
         }
         return allOrders;
+    }
+
+    private void importRelations(OrderTableEntity orderEntity, Order orderModel) {
+        orderEntity.setClientEntity(manager.find(ClientTableEntity.class, orderModel.getClient().getId()));
+        orderEntity.setMachinistEntity(manager.find(MachinistTableEntity.class, orderModel.getMachinist().getId()));
+        orderEntity.setOrderStatusEntity(manager.find(OrderStatusTableEntity.class, orderModel.getStatus().getId()));
     }
 }

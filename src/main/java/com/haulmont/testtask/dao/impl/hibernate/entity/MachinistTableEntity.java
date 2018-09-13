@@ -29,7 +29,7 @@ public class MachinistTableEntity implements HibernateEntity<Machinist> {
 
     @Id
     @Column(name = "ID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public long getId() {
         return id;
     }
@@ -103,7 +103,9 @@ public class MachinistTableEntity implements HibernateEntity<Machinist> {
 
     @Override
     public MachinistTableEntity toEntity(Machinist model) {
-        this.id = model.getId();
+        if(model.getId() != null) {
+            this.id = model.getId();
+        }
         this.firstname = model.getFirstName();
         this.lastname = model.getLastName();
         this.fathername = model.getFatherName();

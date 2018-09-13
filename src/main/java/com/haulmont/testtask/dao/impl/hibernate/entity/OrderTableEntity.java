@@ -127,7 +127,9 @@ public class OrderTableEntity implements HibernateEntity<Order> {
 
     @Override
     public OrderTableEntity toEntity(Order model) {
-        this.id = model.getId();
+        if(model.getId() != null) {
+            this.id = model.getId();
+        }
         this.description = model.getDescription();
         this.startDate = new java.sql.Date(model.getStartDate().getTime());
         this.endDate = new java.sql.Date(model.getEndDate().getTime());
@@ -143,8 +145,8 @@ public class OrderTableEntity implements HibernateEntity<Order> {
     }
 
     public void importRelations(Order model) {
-        this.clientEntity.toEntity(model.getClient());
-        this.machinistEntity.toEntity(model.getMachinist());
-        this.orderStatusEntity.toEntity(model.getStatus());
+        this.clientEntity = new ClientTableEntity().toEntity(model.getClient());
+        this.machinistEntity = new MachinistTableEntity().toEntity(model.getMachinist());
+        this.orderStatusEntity = new OrderStatusTableEntity().toEntity(model.getStatus());
     }
 }

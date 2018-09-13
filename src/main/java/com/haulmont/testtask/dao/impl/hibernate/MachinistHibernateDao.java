@@ -30,14 +30,13 @@ public class MachinistHibernateDao implements GenericDao<Long, Machinist> {
     }
 
     @Override
-    public Machinist update(Machinist machinistModel) {
+    public void update(Machinist machinistModel) {
         manager.getTransaction().begin();
         MachinistTableEntity machinistEntity = new MachinistTableEntity();
         machinistEntity.toEntity(machinistModel);
         machinistEntity.importOrders(machinistModel);
         manager.merge(machinistEntity);
         manager.getTransaction().commit();
-        return machinistModel;
     }
 
     @Override
