@@ -19,7 +19,7 @@ public class MachinistEditWindow extends Window{
     public MachinistEditWindow(Controller controller) {
         super();
         this.controller = controller;
-        setWidth("80%");
+        setWidth("50%");
         setHeight("60%");
         setModal(true);
         VerticalLayout fieldLayout = initFields();

@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "ORDER_STATUS_TABLE", schema = "PUBLIC", catalog = "PUBLIC")
-public class OrderStatusTableEntity implements HibernateEntity<OrderStatus> {
+public class OrderStatusTableEntity {
     private long id;
     private String status;
     private Set<OrderTableEntity> orderEntitySet;
@@ -58,14 +58,7 @@ public class OrderStatusTableEntity implements HibernateEntity<OrderStatus> {
         return Objects.hash(id, status);
     }
 
-    @Override
     public OrderStatus toModel() {
         return new OrderStatus(id, status);
-    }
-
-    @Override
-    public OrderStatusTableEntity toEntity(OrderStatus model) {
-        //immutable
-        return this;
     }
 }

@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "CLIENT_TABLE", schema = "PUBLIC", catalog = "PUBLIC")
-public class ClientTableEntity implements HibernateEntity<Client> {
+public class ClientTableEntity {
     private long id;
     private String firstname;
     private String lastname;
@@ -95,13 +95,10 @@ public class ClientTableEntity implements HibernateEntity<Client> {
         return Objects.hash(id, firstname, lastname, fathername, phone);
     }
 
-
-    @Override
     public Client toModel() {
         return new Client(id, firstname, lastname, fathername, phone);
     }
 
-    @Override
     public ClientTableEntity toEntity(Client model) {
         if(model.getId() != null) {
             this.id = model.getId();

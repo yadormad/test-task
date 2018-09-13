@@ -33,16 +33,22 @@ public class MainUI extends UI {
     private Button addOrderButton = new Button("Add");
     private Button editOrderButton = new Button("Edit");
     private Button deleteOrderButton = new Button("Delete");
+    private VerticalLayout machinistStatisticsLayout;
+    private Map<OrderStatus, Integer> machinistStatisticsMap;
 
     @Override
     protected void init(VaadinRequest request) {
         controller = new Controller();
         gridContainerHelper = new GridContainerHelper(controller);
+        machinistStatisticsMap = new HashMap<>();
+        for(OrderStatus status: controller.getAllOrderStatuses()) {
+            machinistStatisticsMap.put(status, 0);
+        }
         TabSheet tabSheet = new TabSheet();
 
         VerticalLayout clientsTab = initClientsTab();
 
-        VerticalLayout machinistsTab = initMachinistsTab();
+        HorizontalLayout machinistsTab = initMachinistsTab();
 
         VerticalLayout ordersTab = initOrdersTab();
 
@@ -81,8 +87,19 @@ public class MainUI extends UI {
         return clientsTab;
     }
 
-    private VerticalLayout initMachinistsTab() {
-        VerticalLayout machinistsTab = new VerticalLayout();
+    private HorizontalLayout initMachinistsTab() {
+        HorizontalLayout machinistsTab = new HorizontalLayout();
+        machinistsTab.setSizeFull();
+
+        machinistsTab.setMargin(true);
+
+        VerticalLayout machinistTableLayout = new VerticalLayout();
+        machinistTableLayout.setWidth("70%");
+
+        machinistStatisticsLayout = new VerticalLayout();
+        machinistStatisticsLayout.setCaption("Orders");
+        machinistStatisticsLayout.setWidth("25%");
+
         initMachinistsTable();
         machinistsTab.setCaption("Machinists");
         
@@ -105,8 +122,9 @@ public class MainUI extends UI {
         buttonLayout.setExpandRatio(addMachinistButton, 0.2f);
         buttonLayout.setExpandRatio(editMachinistButton, 0.2f);
         buttonLayout.setExpandRatio(deleteMachinistButton, 0.2f);
-        
-        machinistsTab.addComponents(buttonLayout, machinistGrid);
+
+        machinistTableLayout.addComponent(machinistGrid);
+        machinistsTab.addComponents(buttonLayout, machinistTableLayout, machinistStatisticsLayout);
         return machinistsTab;
     }
 
@@ -198,6 +216,16 @@ public class MainUI extends UI {
             }
         });
         machinistGrid.addSelectionListener(getSelectionListener(editMachinistButton, deleteMachinistButton));
+        machinistGrid.addSelectionListener((SelectionEvent.SelectionListener) selectionEvent -> {
+            if(selectionEvent.getSelected().size() == 1) {
+                calculateStatistics();
+                viewStatistics();
+            } else {
+                for(OrderStatus status: controller.getAllOrderStatuses()) {
+                    machinistStatisticsMap.put(status, 0);
+                }
+            }
+        });
         
         machinistGrid.setContainerDataSource(gridContainerHelper.getMachinistsContainer());
         machinistGrid.setWidth("100%");
@@ -209,7 +237,26 @@ public class MainUI extends UI {
         machinistGrid.getColumn("valueCost").setHeaderCaption("Hour Cost");
         machinistGrid.setColumnOrder("firstName", "lastName", "fatherName", "valueCost");
     }
-    
+
+    public void calculateStatistics() {
+        for(OrderStatus status: controller.getAllOrderStatuses()) {
+            machinistStatisticsMap.put(status, 0);
+        }
+        if (machinistGrid.getSelectedRow() != null) {
+            Machinist selectedMachinist = (Machinist) machinistGrid.getSelectedRow();
+            for (Order order : selectedMachinist.getMachinistOrders()) {
+                machinistStatisticsMap.put(order.getStatus(), machinistStatisticsMap.get(order.getStatus()) + 1);
+            }
+        }
+    }
+
+    private void viewStatistics() {
+        machinistStatisticsLayout.removeAllComponents();
+        for(OrderStatus orderStatus: machinistStatisticsMap.keySet()) {
+            machinistStatisticsLayout.addComponent(new Label(orderStatus.getStatus() + ": " + machinistStatisticsMap.get(orderStatus)));
+        }
+    }
+
     private void initOrdersTable() {
         orderGrid = new Grid();
         orderGrid.setSizeFull();

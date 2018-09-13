@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "ORDER_TABLE", schema = "PUBLIC", catalog = "PUBLIC")
-public class OrderTableEntity implements HibernateEntity<Order> {
+public class OrderTableEntity {
     private long id;
     private String description;
     private ClientTableEntity clientEntity;
@@ -120,12 +120,10 @@ public class OrderTableEntity implements HibernateEntity<Order> {
         return Objects.hash(id, description, startDate, endDate, fullCost);
     }
 
-    @Override
     public Order toModel() {
         return new Order(id, description, startDate, endDate, fullCost);
     }
 
-    @Override
     public OrderTableEntity toEntity(Order model) {
         if(model.getId() != null) {
             this.id = model.getId();
@@ -142,11 +140,5 @@ public class OrderTableEntity implements HibernateEntity<Order> {
         model.setMachinist(this.machinistEntity.toModel());
         model.setStatus(this.orderStatusEntity.toModel());
         return model;
-    }
-
-    public void importRelations(Order model) {
-        this.clientEntity = new ClientTableEntity().toEntity(model.getClient());
-        this.machinistEntity = new MachinistTableEntity().toEntity(model.getMachinist());
-        this.orderStatusEntity = new OrderStatusTableEntity().toEntity(model.getStatus());
     }
 }

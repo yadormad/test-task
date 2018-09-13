@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "MACHINIST_TABLE", schema = "PUBLIC", catalog = "PUBLIC")
-public class MachinistTableEntity implements HibernateEntity<Machinist> {
+public class MachinistTableEntity {
     private long id;
     private String firstname;
     private String lastname;
@@ -96,12 +96,10 @@ public class MachinistTableEntity implements HibernateEntity<Machinist> {
         return Objects.hash(id, firstname, lastname, fathername, hourCost);
     }
 
-    @Override
     public Machinist toModel() {
         return new Machinist(id, firstname, lastname, fathername, hourCost);
     }
 
-    @Override
     public MachinistTableEntity toEntity(Machinist model) {
         if(model.getId() != null) {
             this.id = model.getId();
