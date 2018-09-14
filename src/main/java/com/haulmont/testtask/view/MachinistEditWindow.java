@@ -14,13 +14,11 @@ public class MachinistEditWindow extends Window{
     private TextField hourCostField;
     private Button saveButton;
     private Button cancelButton;
-    private Controller controller;
 
-    public MachinistEditWindow(Controller controller) {
+    public MachinistEditWindow() {
         super();
-        this.controller = controller;
         setWidth("50%");
-        setHeight("60%");
+        setHeight("30%");
         setModal(true);
         VerticalLayout fieldLayout = initFields();
         fieldLayout.setMargin(new MarginInfo(true));
@@ -65,7 +63,7 @@ public class MachinistEditWindow extends Window{
             if(errorMsg != null) {
                 saveButton.setComponentError(new UserError(errorMsg));
             } else {
-                machinistContainer.addItem(controller.addMachinist(new Machinist(firstNameField.getValue(), lastNameField.getValue(), fatherNameField.getValue(), new Double(hourCostField.getValue()))));
+                machinistContainer.addItem(Controller.getInstance().addMachinist(new Machinist(firstNameField.getValue(), lastNameField.getValue(), fatherNameField.getValue(), new Double(hourCostField.getValue()))));
                 this.close();
             }
         });
@@ -85,7 +83,7 @@ public class MachinistEditWindow extends Window{
                 machinist.setLastName(lastNameField.getValue());
                 machinist.setFatherName(fatherNameField.getValue());
                 machinist.setValueCost(Double.valueOf(hourCostField.getValue()));
-                controller.updateMachinist(machinist);
+                Controller.getInstance().updateMachinist(machinist);
                 gridContainerHelper.updateMachinistContainer();
                 this.close();
             }
@@ -106,7 +104,7 @@ public class MachinistEditWindow extends Window{
     private HorizontalLayout initButtons() {
         HorizontalLayout buttonsLayout = new HorizontalLayout();
         this.saveButton = new Button("Save");
-        this.saveButton.setStyleName("Friendly");
+        this.saveButton.setStyleName("friendly");
         this.cancelButton = new Button("Cancel");
         buttonsLayout.addComponent(saveButton);
         buttonsLayout.addComponent(cancelButton);

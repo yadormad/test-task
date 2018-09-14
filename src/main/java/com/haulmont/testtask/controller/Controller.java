@@ -3,10 +3,7 @@ package com.haulmont.testtask.controller;
 import com.haulmont.testtask.dao.DaoFactory;
 import com.haulmont.testtask.dao.DeleteException;
 import com.haulmont.testtask.dao.impl.hibernate.HibernateDaoFactory;
-import com.haulmont.testtask.model.Client;
-import com.haulmont.testtask.model.Machinist;
-import com.haulmont.testtask.model.Order;
-import com.haulmont.testtask.model.OrderStatus;
+import com.haulmont.testtask.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +11,25 @@ import java.util.Map;
 public class Controller {
     private DaoFactory daoFactory;
 
-    public Controller() {
+    private OrderFilter orderFilter;
+
+    private static volatile Controller instance;
+
+    public static Controller getInstance() {
+        Controller localInstance = instance;
+        if (localInstance == null) {
+            synchronized (Controller.class) {
+                localInstance = instance;
+                if (localInstance == null) {
+                    instance = localInstance = new Controller();
+                }
+            }
+        }
+        return localInstance;
+    }
+
+
+    private Controller() {
         daoFactory = new HibernateDaoFactory();
     }
 
@@ -25,7 +40,11 @@ public class Controller {
         return daoFactory.getMachinistDao().getAll();
     }
     public List<Order> getAllOrders() {
-        return daoFactory.getOrderDao().getAll();
+        if(orderFilter == null) {
+            return daoFactory.getOrderDao().getAll();
+        } else {
+            return daoFactory.getServiceDao().getFilteredOrder(orderFilter);
+        }
     }
     public List<OrderStatus> getAllOrderStatuses() {
         return daoFactory.getOrderStatusDao().getAll();
@@ -74,5 +93,13 @@ public class Controller {
 
     public Map<String, Long> getMachinistStat(Machinist machinist) {
         return daoFactory.getServiceDao().getMachinistOrderStatistic(machinist);
+    }
+
+    public OrderFilter getOrderFilter() {
+        return orderFilter;
+    }
+
+    public void setOrderFilter(OrderFilter orderFilter) {
+        this.orderFilter = orderFilter;
     }
 }

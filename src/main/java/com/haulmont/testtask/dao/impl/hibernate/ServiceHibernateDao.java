@@ -2,10 +2,7 @@ package com.haulmont.testtask.dao.impl.hibernate;
 
 import com.haulmont.testtask.dao.ServiceDao;
 import com.haulmont.testtask.dao.impl.hibernate.entity.OrderTableEntity;
-import com.haulmont.testtask.model.Client;
-import com.haulmont.testtask.model.Machinist;
-import com.haulmont.testtask.model.Order;
-import com.haulmont.testtask.model.OrderStatus;
+import com.haulmont.testtask.model.*;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -35,14 +32,14 @@ public class ServiceHibernateDao implements ServiceDao {
     }
 
     @Override
-    public List<Order> getFilteredOrder(String descriptionFilter, Client clientFilter, OrderStatus orderStatusFilter) {
-        String filteredQueryString = "select o from OrderTableEntity o" +
-                "where description like '%" + descriptionFilter + "%'";
-        if (clientFilter != null) {
-            filteredQueryString = filteredQueryString + " and client_id = " + clientFilter.getId();
+    public List<Order> getFilteredOrder(OrderFilter orderFilter) {
+        String filteredQueryString = "select o from OrderTableEntity o " +
+                "where description like '%" + orderFilter.getDescription() + "%'";
+        if (orderFilter.getClient() != null) {
+            filteredQueryString = filteredQueryString + " and clientEntity.id = " + orderFilter.getClient().getId();
         }
-        if (orderStatusFilter != null) {
-            filteredQueryString = filteredQueryString + " and order_status_id = " + orderStatusFilter.getId();
+        if (orderFilter.getOrderStatus() != null) {
+            filteredQueryString = filteredQueryString + " and orderStatusEntity.id = " + orderFilter.getOrderStatus().getId();
         }
         List<Order> orderList = new ArrayList<>();
         for (OrderTableEntity orderEntity: manager.createQuery(filteredQueryString, OrderTableEntity.class).getResultList()) {

@@ -23,7 +23,6 @@ public class MainUI extends UI {
     private Grid clientGrid;
     private Grid machinistGrid;
     private Grid orderGrid;
-    private Controller controller;
     private GridContainerHelper gridContainerHelper;
     private Button addClientButton = new Button("Add");
     private Button editClientButton = new Button("Edit");
@@ -38,8 +37,7 @@ public class MainUI extends UI {
 
     @Override
     protected void init(VaadinRequest request) {
-        controller = new Controller();
-        gridContainerHelper = new GridContainerHelper(controller);
+        gridContainerHelper = new GridContainerHelper();
         TabSheet tabSheet = new TabSheet();
 
         VerticalLayout clientsTab = initClientsTab();
@@ -67,7 +65,7 @@ public class MainUI extends UI {
         editClientButton.addStyleName("friendly");
         deleteClientButton.addStyleName("danger");
         addClientButton.addClickListener((Button.ClickListener) clickEvent -> {
-            ClientEditWindow clientEditWindow = new ClientEditWindow(controller);
+            ClientEditWindow clientEditWindow = new ClientEditWindow();
             clientEditWindow.addClient(gridContainerHelper.getClientsContainer());
             addWindow(clientEditWindow);
         });
@@ -87,8 +85,6 @@ public class MainUI extends UI {
         VerticalLayout machinistsTab = new VerticalLayout();
         machinistsTab.setSizeFull();
 
-        machinistsTab.setMargin(true);
-
         VerticalLayout machinistTableLayout = new VerticalLayout();
 
         machinistStatisticsLayout = new VerticalLayout();
@@ -104,7 +100,7 @@ public class MainUI extends UI {
         editMachinistButton.addStyleName("friendly");
         deleteMachinistButton.addStyleName("danger");
         addMachinistButton.addClickListener((Button.ClickListener) clickEvent -> {
-            MachinistEditWindow machinistEditWindow = new MachinistEditWindow(controller);
+            MachinistEditWindow machinistEditWindow = new MachinistEditWindow();
             machinistEditWindow.addMachinist(gridContainerHelper.getMachinistsContainer());
             addWindow(machinistEditWindow);
         });
@@ -149,13 +145,15 @@ public class MainUI extends UI {
         deleteOrderButton.setVisible(false);
         Button filterButton = new Button("Filter");
         filterButton.addClickListener((Button.ClickListener) clickEvent -> {
-
+            OrderFilterWindow orderFilterWindow = new OrderFilterWindow(gridContainerHelper);
+            orderFilterWindow.setFilter();
+            addWindow(orderFilterWindow);
         });
 
         addOrderButton.addClickListener((Button.ClickListener) clickEvent -> {
-            OrderEditWindow OrderEditWindow = new OrderEditWindow(controller, gridContainerHelper);
-            OrderEditWindow.addOrder(gridContainerHelper.getOrdersContainer());
-            addWindow(OrderEditWindow);
+            OrderEditWindow orderEditWindow = new OrderEditWindow(gridContainerHelper);
+            orderEditWindow.addOrder(gridContainerHelper.getOrdersContainer());
+            addWindow(orderEditWindow);
         });
 
         buttonLayout.addComponents(addOrderButton, editOrderButton, deleteOrderButton, filterButton);
@@ -179,7 +177,7 @@ public class MainUI extends UI {
         editClientButton.setVisible(false);
         deleteClientButton.setVisible(false);
         editClientButton.addClickListener((Button.ClickListener) clickEvent -> {
-            ClientEditWindow clientEditWindow = new ClientEditWindow(controller);
+            ClientEditWindow clientEditWindow = new ClientEditWindow();
             Client selectedClient = (Client) clientGrid.getSelectedRow();
             clientEditWindow.editClient(gridContainerHelper, selectedClient);
             addWindow(clientEditWindow);
@@ -187,7 +185,7 @@ public class MainUI extends UI {
         deleteClientButton.addClickListener((Button.ClickListener) clickEvent -> {
             Client selectedClient = (Client) clientGrid.getSelectedRow();
             try {
-                controller.deleteClient(selectedClient.getId());
+                Controller.getInstance().deleteClient(selectedClient.getId());
                 gridContainerHelper.getClientsContainer().removeItem(selectedClient);
                 deleteClientButton.setComponentError(null);
             } catch (DeleteException e) {
@@ -214,7 +212,7 @@ public class MainUI extends UI {
         editMachinistButton.setVisible(false);
         deleteMachinistButton.setVisible(false);
         editMachinistButton.addClickListener((Button.ClickListener) clickEvent -> {
-            MachinistEditWindow MachinistEditWindow = new MachinistEditWindow(controller);
+            MachinistEditWindow MachinistEditWindow = new MachinistEditWindow();
             Machinist selectedMachinist = (Machinist) machinistGrid.getSelectedRow();
             MachinistEditWindow.editMachinist(gridContainerHelper, selectedMachinist);
             addWindow(MachinistEditWindow);
@@ -222,7 +220,7 @@ public class MainUI extends UI {
         deleteMachinistButton.addClickListener((Button.ClickListener) clickEvent -> {
             Machinist selectedMachinist = (Machinist) machinistGrid.getSelectedRow();
             try {
-                controller.deleteMachinist(selectedMachinist.getId());
+                Controller.getInstance().deleteMachinist(selectedMachinist.getId());
                 gridContainerHelper.getMachinistsContainer().removeItem(selectedMachinist);
                 deleteMachinistButton.setComponentError(null);
             } catch (DeleteException e) {
@@ -251,7 +249,7 @@ public class MainUI extends UI {
 
     private void viewStatistics() {
         machinistStatisticsLayout.removeAllComponents();
-        controller.getMachinistStat((Machinist) machinistGrid.getSelectedRow()).forEach((s, integer) -> machinistStatisticsLayout.addComponent(new Label(s + ": " + integer)));
+        Controller.getInstance().getMachinistStat((Machinist) machinistGrid.getSelectedRow()).forEach((s, integer) -> machinistStatisticsLayout.addComponent(new Label(s + ": " + integer)));
     }
 
     private void initOrdersTable() {
@@ -259,7 +257,7 @@ public class MainUI extends UI {
         orderGrid.setSizeFull();
 
         editOrderButton.addClickListener((Button.ClickListener) clickEvent -> {
-            OrderEditWindow OrderEditWindow = new OrderEditWindow(controller, gridContainerHelper);
+            OrderEditWindow OrderEditWindow = new OrderEditWindow(gridContainerHelper);
             Order selectedOrder = (Order) orderGrid.getSelectedRow();
             OrderEditWindow.editOrder(selectedOrder);
             addWindow(OrderEditWindow);
@@ -267,7 +265,7 @@ public class MainUI extends UI {
         deleteOrderButton.addClickListener((Button.ClickListener) clickEvent -> {
             Order selectedOrder = (Order) orderGrid.getSelectedRow();
             try {
-                controller.deleteOrder(selectedOrder.getId());
+                Controller.getInstance().deleteOrder(selectedOrder.getId());
                 gridContainerHelper.getOrdersContainer().removeItem(selectedOrder);
                 deleteOrderButton.setComponentError(null);
             } catch (DeleteException e) {

@@ -12,19 +12,17 @@ public class GridContainerHelper {
     private BeanItemContainer<Order> ordersContainer;
     private BeanItemContainer<Machinist> machinistsContainer;
     private BeanItemContainer<OrderStatus> orderStatusContainer;
-    private Controller controller;
 
-    public GridContainerHelper(Controller controller) {
-        this.controller = controller;
+    public GridContainerHelper() {
         clientsContainer = new BeanItemContainer<>(Client.class);
         ordersContainer = new BeanItemContainer<>(Order.class);
         machinistsContainer = new BeanItemContainer<>(Machinist.class);
         orderStatusContainer = new BeanItemContainer<>(OrderStatus.class);
 
-        clientsContainer.addAll(controller.getAllClients());
-        ordersContainer.addAll(controller.getAllOrders());
-        machinistsContainer.addAll(controller.getAllMachinists());
-        orderStatusContainer.addAll(controller.getAllOrderStatuses());
+        clientsContainer.addAll(Controller.getInstance().getAllClients());
+        ordersContainer.addAll(Controller.getInstance().getAllOrders());
+        machinistsContainer.addAll(Controller.getInstance().getAllMachinists());
+        orderStatusContainer.addAll(Controller.getInstance().getAllOrderStatuses());
     }
 
     public BeanItemContainer<Client> getClientsContainer() {
@@ -41,17 +39,17 @@ public class GridContainerHelper {
 
     public void updateClientContainer() {
         clientsContainer.removeAllItems();
-        clientsContainer.addAll(controller.getAllClients());
+        clientsContainer.addAll(Controller.getInstance().getAllClients());
     }
 
     public void updateMachinistContainer() {
         machinistsContainer.removeAllItems();
-        machinistsContainer.addAll(controller.getAllMachinists());
+        machinistsContainer.addAll(Controller.getInstance().getAllMachinists());
     }
 
     public void updateOrderContainer() {
         ordersContainer.removeAllItems();
-        ordersContainer.addAll(controller.getAllOrders());
+        ordersContainer.addAll(Controller.getInstance().getAllOrders());
     }
 
     public BeanItemContainer<OrderStatus> getOrderStatusContainer() {

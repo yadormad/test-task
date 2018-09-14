@@ -23,14 +23,11 @@ public class OrderEditWindow extends Window{
     private Button saveButton;
     private Button cancelButton;
 
-    private Controller controller;
 
-
-    public OrderEditWindow(Controller controller, GridContainerHelper gridContainerHelper) {
+    public OrderEditWindow(GridContainerHelper gridContainerHelper) {
         super();
-        this.controller = controller;
         this.gridContainerHelper = gridContainerHelper;
-        setWidth("50%");
+        setWidth("30%");
         setHeight("100%");
         setModal(true);
         VerticalLayout fieldLayout = initFields();
@@ -124,7 +121,7 @@ public class OrderEditWindow extends Window{
                 addedOrder.setMachinist((Machinist) machinistSelect.getValue());
                 addedOrder.setClient((Client) clientSelect.getValue());
                 addedOrder.setStatus((OrderStatus) statusSelect.getValue());
-                orderContainer.addItem(controller.addOrder(addedOrder));
+                orderContainer.addItem(Controller.getInstance().addOrder(addedOrder));
                 this.close();
             }
         });
@@ -179,7 +176,7 @@ public class OrderEditWindow extends Window{
                 order.setMachinist((Machinist) machinistSelect.getValue());
                 order.setClient((Client) clientSelect.getValue());
                 order.setStatus((OrderStatus) statusSelect.getValue());
-                controller.updateOrder(order);
+                Controller.getInstance().updateOrder(order);
                 gridContainerHelper.updateOrderContainer();
                 this.close();
             }
@@ -204,7 +201,7 @@ public class OrderEditWindow extends Window{
     private HorizontalLayout initButtons() {
         HorizontalLayout buttonsLayout = new HorizontalLayout();
         this.saveButton = new Button("Save");
-        this.saveButton.setStyleName("Friendly");
+        this.saveButton.setStyleName("friendly");
         this.cancelButton = new Button("Cancel");
         buttonsLayout.addComponent(saveButton);
         buttonsLayout.addComponent(cancelButton);

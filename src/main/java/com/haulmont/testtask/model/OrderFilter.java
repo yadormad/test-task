@@ -2,12 +2,12 @@ package com.haulmont.testtask.model;
 
 public class OrderFilter {
     private String description;
-    private Client clientId;
+    private Client client;
     private OrderStatus orderStatus;
 
-    public OrderFilter(String description, Client clientId, OrderStatus orderStatus) {
+    public OrderFilter(String description, Client client, OrderStatus orderStatus) {
         this.description = description;
-        this.clientId = clientId;
+        this.client = client;
         this.orderStatus = orderStatus;
     }
 
@@ -15,8 +15,8 @@ public class OrderFilter {
         return description;
     }
 
-    public Client getClientId() {
-        return clientId;
+    public Client getClient() {
+        return client;
     }
 
     public OrderStatus getOrderStatus() {
