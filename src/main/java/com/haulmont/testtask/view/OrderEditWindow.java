@@ -190,6 +190,7 @@ public class OrderEditWindow extends Window{
         if(startDateField.isEmpty()) return "Start date field is mandatory";
         if(endDateField.isEmpty()) return "End date field is mandatory";
         if(statusSelect.isEmpty()) return "Status field is mandatory";
+        if(startDateField.getValue().after(endDateField.getValue())) return "Start date must be pefore end date";
         try {
             new Double(costField.getValue());
         } catch (NumberFormatException e) {

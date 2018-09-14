@@ -13,8 +13,10 @@ import com.vaadin.server.*;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.declarative.converters.DesignDateConverter;
+import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Theme(ValoTheme.THEME_NAME)
@@ -122,7 +124,7 @@ public class MainUI extends UI {
 
         machinistInfo.setExpandRatio(machinistTableLayout, 0.7f);
         machinistInfo.setExpandRatio(machinistStatisticsLayout, 0.3f);
-        machinistTableLayout.setMargin(new MarginInfo(false, true));
+        machinistTableLayout.setMargin(new MarginInfo(false, true, false, false));
         machinistStatisticsLayout.setMargin(true);
 
 
@@ -322,8 +324,8 @@ public class MainUI extends UI {
                 return String.class;
             }
         });
-        orderGrid.getColumn("startDate").setHeaderCaption("Start Date").setConverter(new DesignDateConverter());
-        orderGrid.getColumn("endDate").setHeaderCaption("End Date");
+        orderGrid.getColumn("startDate").setHeaderCaption("Start Date").setRenderer(new DateRenderer(new SimpleDateFormat("yyyy-MM-dd")));
+        orderGrid.getColumn("endDate").setHeaderCaption("End Date").setRenderer(new DateRenderer(new SimpleDateFormat("yyyy-MM-dd")));;
         orderGrid.getColumn("cost").setHeaderCaption("Cost");
         orderGrid.getColumn("status").setHeaderCaption("Status");
         orderGrid.getColumn("status").setConverter(new Converter<String, OrderStatus>() {

@@ -45,6 +45,3 @@ insert into order_table values(2, 'Замена масла', 2, 0, '2018-09-09',
 insert into order_table values(3, 'Замена тормозных колодок', 3, 2, '2018-09-01', '2018-09-03', 2200, 1)
 insert into order_table values(4, 'Ремонт правого поворотника', 2, 3, '2018-09-11', '2018-09-12', 1600, 0)
 insert into order_table values(5, 'Замена покрышек', 1, 0, '2018-09-01', '2018-09-02', 1800, 2)
-
-jdbc:hsqldb:file:database/workhop
-
