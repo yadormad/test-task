@@ -12,6 +12,7 @@ import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.*;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
+import com.vaadin.ui.declarative.converters.DesignDateConverter;
 import com.vaadin.ui.themes.ValoTheme;
 
 import java.util.*;
@@ -34,21 +35,16 @@ public class MainUI extends UI {
     private Button editOrderButton = new Button("Edit");
     private Button deleteOrderButton = new Button("Delete");
     private VerticalLayout machinistStatisticsLayout;
-    private Map<OrderStatus, Integer> machinistStatisticsMap;
 
     @Override
     protected void init(VaadinRequest request) {
         controller = new Controller();
         gridContainerHelper = new GridContainerHelper(controller);
-        machinistStatisticsMap = new HashMap<>();
-        for(OrderStatus status: controller.getAllOrderStatuses()) {
-            machinistStatisticsMap.put(status, 0);
-        }
         TabSheet tabSheet = new TabSheet();
 
         VerticalLayout clientsTab = initClientsTab();
 
-        HorizontalLayout machinistsTab = initMachinistsTab();
+        VerticalLayout machinistsTab = initMachinistsTab();
 
         VerticalLayout ordersTab = initOrdersTab();
 
@@ -87,22 +83,20 @@ public class MainUI extends UI {
         return clientsTab;
     }
 
-    private HorizontalLayout initMachinistsTab() {
-        HorizontalLayout machinistsTab = new HorizontalLayout();
+    private VerticalLayout initMachinistsTab() {
+        VerticalLayout machinistsTab = new VerticalLayout();
         machinistsTab.setSizeFull();
 
         machinistsTab.setMargin(true);
 
         VerticalLayout machinistTableLayout = new VerticalLayout();
-        machinistTableLayout.setWidth("70%");
 
         machinistStatisticsLayout = new VerticalLayout();
         machinistStatisticsLayout.setCaption("Orders");
-        machinistStatisticsLayout.setWidth("25%");
 
         initMachinistsTable();
         machinistsTab.setCaption("Machinists");
-        
+
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setSpacing(true);
         buttonLayout.setMargin(new MarginInfo(true,true, true, true));
@@ -124,7 +118,19 @@ public class MainUI extends UI {
         buttonLayout.setExpandRatio(deleteMachinistButton, 0.2f);
 
         machinistTableLayout.addComponent(machinistGrid);
-        machinistsTab.addComponents(buttonLayout, machinistTableLayout, machinistStatisticsLayout);
+
+        HorizontalLayout machinistInfo = new HorizontalLayout();
+        machinistInfo.setSizeFull();
+
+        machinistInfo.addComponents(machinistTableLayout, machinistStatisticsLayout);
+
+        machinistInfo.setExpandRatio(machinistTableLayout, 0.7f);
+        machinistInfo.setExpandRatio(machinistStatisticsLayout, 0.3f);
+        machinistTableLayout.setMargin(new MarginInfo(false, true));
+        machinistStatisticsLayout.setMargin(true);
+
+
+        machinistsTab.addComponents(buttonLayout, machinistInfo);
         return machinistsTab;
     }
 
@@ -139,29 +145,37 @@ public class MainUI extends UI {
         addOrderButton.addStyleName("primary");
         editOrderButton.addStyleName("friendly");
         deleteOrderButton.addStyleName("danger");
+        editOrderButton.setVisible(false);
+        deleteOrderButton.setVisible(false);
+        Button filterButton = new Button("Filter");
+        filterButton.addClickListener((Button.ClickListener) clickEvent -> {
+
+        });
+
         addOrderButton.addClickListener((Button.ClickListener) clickEvent -> {
             OrderEditWindow OrderEditWindow = new OrderEditWindow(controller, gridContainerHelper);
             OrderEditWindow.addOrder(gridContainerHelper.getOrdersContainer());
             addWindow(OrderEditWindow);
         });
 
-        buttonLayout.addComponents(addOrderButton, editOrderButton, deleteOrderButton);
+        buttonLayout.addComponents(addOrderButton, editOrderButton, deleteOrderButton, filterButton);
         buttonLayout.setComponentAlignment(addOrderButton, Alignment.MIDDLE_LEFT);
         buttonLayout.setComponentAlignment(editOrderButton, Alignment.MIDDLE_LEFT);
         buttonLayout.setComponentAlignment(deleteOrderButton, Alignment.MIDDLE_LEFT);
+        buttonLayout.setComponentAlignment(filterButton, Alignment.MIDDLE_RIGHT);
         buttonLayout.setExpandRatio(addOrderButton, 0.2f);
         buttonLayout.setExpandRatio(editOrderButton, 0.2f);
         buttonLayout.setExpandRatio(deleteOrderButton, 0.2f);
 
         ordersTab.addComponents(buttonLayout, orderGrid);
-        
+
         return ordersTab;
     }
 
     private void initClientsTable() {
         clientGrid = new Grid();
         clientGrid.setSizeFull();
-        
+
         editClientButton.setVisible(false);
         deleteClientButton.setVisible(false);
         editClientButton.addClickListener((Button.ClickListener) clickEvent -> {
@@ -181,7 +195,7 @@ public class MainUI extends UI {
             }
         });
         clientGrid.addSelectionListener(getSelectionListener(editClientButton, deleteClientButton));
-        
+
         clientGrid.setContainerDataSource(gridContainerHelper.getClientsContainer());
         clientGrid.setWidth("100%");
         clientGrid.removeColumn("id");
@@ -192,7 +206,7 @@ public class MainUI extends UI {
         clientGrid.getColumn("phoneNumber").setHeaderCaption("Phone Number");
         clientGrid.setColumnOrder("firstName", "lastName", "fatherName", "phoneNumber");
     }
-    
+
     private void initMachinistsTable() {
         machinistGrid = new Grid();
         machinistGrid.setSizeFull();
@@ -218,15 +232,12 @@ public class MainUI extends UI {
         machinistGrid.addSelectionListener(getSelectionListener(editMachinistButton, deleteMachinistButton));
         machinistGrid.addSelectionListener((SelectionEvent.SelectionListener) selectionEvent -> {
             if(selectionEvent.getSelected().size() == 1) {
-                calculateStatistics();
                 viewStatistics();
             } else {
-                for(OrderStatus status: controller.getAllOrderStatuses()) {
-                    machinistStatisticsMap.put(status, 0);
-                }
+                machinistStatisticsLayout.removeAllComponents();
             }
         });
-        
+
         machinistGrid.setContainerDataSource(gridContainerHelper.getMachinistsContainer());
         machinistGrid.setWidth("100%");
         machinistGrid.removeColumn("id");
@@ -238,31 +249,15 @@ public class MainUI extends UI {
         machinistGrid.setColumnOrder("firstName", "lastName", "fatherName", "valueCost");
     }
 
-    public void calculateStatistics() {
-        for(OrderStatus status: controller.getAllOrderStatuses()) {
-            machinistStatisticsMap.put(status, 0);
-        }
-        if (machinistGrid.getSelectedRow() != null) {
-            Machinist selectedMachinist = (Machinist) machinistGrid.getSelectedRow();
-            for (Order order : selectedMachinist.getMachinistOrders()) {
-                machinistStatisticsMap.put(order.getStatus(), machinistStatisticsMap.get(order.getStatus()) + 1);
-            }
-        }
-    }
-
     private void viewStatistics() {
         machinistStatisticsLayout.removeAllComponents();
-        for(OrderStatus orderStatus: machinistStatisticsMap.keySet()) {
-            machinistStatisticsLayout.addComponent(new Label(orderStatus.getStatus() + ": " + machinistStatisticsMap.get(orderStatus)));
-        }
+        controller.getMachinistStat((Machinist) machinistGrid.getSelectedRow()).forEach((s, integer) -> machinistStatisticsLayout.addComponent(new Label(s + ": " + integer)));
     }
 
     private void initOrdersTable() {
         orderGrid = new Grid();
         orderGrid.setSizeFull();
 
-        editOrderButton.setVisible(false);
-        deleteOrderButton.setVisible(false);
         editOrderButton.addClickListener((Button.ClickListener) clickEvent -> {
             OrderEditWindow OrderEditWindow = new OrderEditWindow(controller, gridContainerHelper);
             Order selectedOrder = (Order) orderGrid.getSelectedRow();
@@ -280,7 +275,7 @@ public class MainUI extends UI {
             }
         });
         orderGrid.addSelectionListener(getSelectionListener(editOrderButton, deleteOrderButton));
-        
+
         orderGrid.setContainerDataSource(gridContainerHelper.getOrdersContainer());
         orderGrid.setWidth("100%");
         orderGrid.removeColumn("id");
@@ -329,7 +324,7 @@ public class MainUI extends UI {
                 return String.class;
             }
         });
-        orderGrid.getColumn("startDate").setHeaderCaption("Start Date");
+        orderGrid.getColumn("startDate").setHeaderCaption("Start Date").setConverter(new DesignDateConverter());
         orderGrid.getColumn("endDate").setHeaderCaption("End Date");
         orderGrid.getColumn("cost").setHeaderCaption("Cost");
         orderGrid.getColumn("status").setHeaderCaption("Status");

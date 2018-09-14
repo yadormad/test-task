@@ -9,6 +9,7 @@ import com.haulmont.testtask.model.Order;
 import com.haulmont.testtask.model.OrderStatus;
 
 import java.util.List;
+import java.util.Map;
 
 public class Controller {
     private DaoFactory daoFactory;
@@ -69,5 +70,9 @@ public class Controller {
 
     public void deleteOrder(Long orderId) throws DeleteException {
         daoFactory.getOrderDao().delete(orderId);
+    }
+
+    public Map<String, Long> getMachinistStat(Machinist machinist) {
+        return daoFactory.getServiceDao().getMachinistOrderStatistic(machinist);
     }
 }
